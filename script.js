@@ -2,12 +2,12 @@
 // CONSTANTES Y CONFIGURACIONES
 // =============================================
 const CONFIG = {
-  WEDDING_DATE: '2025-09-06T00:00:00',
+  WEDDING_DATE: '2027-06-05T00:00:00',
   GOOGLE_SHEET: {
-    ID: '1d-DENXIR_K00LXYBZYq1AGS6DdSxJ5Z8WXv0hZdc1Rg',
+    ID: '1-3TiGddxDZIjVNgPjH-7DcMIhxMxcosA1WrwLUJuRAs',
     RSVP_SHEET_NAME: 'RSVP',
     BUS_SHEET_NAME: 'BUS',
-    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyXovH6jf8nUAB-yDtmX1VOeLwQLRRLaoPrGu-3BJWsdWeXkZO3G9gTy9jgfkljVGXsNA/exec'
+    SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz2PZ0sWMh-ZwSNkTieG2kJkJERxlDIb_66oD5YlSkGRv62WIrnJYuO5Z29oD6ocNw/exec'
   },
   VALIDATION: {
     PATTERNS: {
@@ -157,7 +157,7 @@ async function submitToGoogleSheet(formData, sheetName) {
       method: 'POST',
       mode: 'no-cors',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'text/plain;charset=UTF-8',
       },
       body: JSON.stringify({
         action: 'submit',
@@ -538,148 +538,539 @@ const StoryCarouselModule = (() => {
   return { init };
 })();
 
+
 const FormModule = (() => {
-  /**
-   * Maneja el envío del formulario RSVP
-   */
-  async function handleRsvpSubmit(e) {
-    e.preventDefault();
-    const form = e.target;
-    const submitButton = form.querySelector('.submit-button');
-    
-    if (!validateForm(form)) return;
-    
-    submitButton.classList.add('loading');
-    submitButton.disabled = true;
 
-    try {
-      const formData = {
-        name: document.getElementById('rsvp-name').value,
-        email: document.getElementById('rsvp-email').value,
-        phone: document.getElementById('rsvp-phone').value,
-        menu: document.getElementById('rsvp-menu').value,
-        allergies: document.getElementById('rsvp-allergies').value,
-        timestamp: new Date().toISOString()
-      };
+    // =============================================
+    // ELEMENTOS Y CONFIGURACIÓN
+    // =============================================
 
-      await submitToGoogleSheet(formData, CONFIG.GOOGLE_SHEET.RSVP_SHEET_NAME);
+    const elements = {
+        rsvpForm: document.getElementById('rsvp-form'),
+        busForm: document.getElementById('bus-form'),
+        adultsInput: document.getElementById('rsvp-adults'),
+        childrenInput: document.getElementById('rsvp-children'),
+        attendeesContainer: document.getElementById('attendees-container'),
+        attendeesError: document.querySelector('.attendees-error')
+    };
 
-      const successMessage = document.createElement('div');
-      successMessage.className = 'form-success';
-      successMessage.innerHTML = `
-        <i class="fas fa-check-circle"></i>
-        <h3>¡Gracias!</h3>
-        <p>Tu confirmación ha sido registrada correctamente.</p>
-        <p>Si vienes acompañado, rellena el formulario de nuevo con los datos de tu acompañante, por favor.</p>
-      `;
-      form.appendChild(successMessage);
+    const MAX_ATTENDEES = 20;
 
-      setTimeout(() => {
-        successMessage.classList.add('show');
-      }, 100);
+    const MENU_OPTIONS = [
+        { value: 'normal', label: 'Menú Normal' },
+        { value: 'vegetariano', label: 'Menú Vegetariano' },
+        { value: 'vegano', label: 'Menú Vegano' }
+    ];
 
-      form.reset();
-    } catch (error) {
-      const errorMessage = document.createElement('div');
-      errorMessage.className = 'form-error';
-      errorMessage.innerHTML = `
-        <i class="fas fa-exclamation-circle"></i>
-        <h3>Error</h3>
-        <p>Hubo un problema al procesar tu confirmación. Por favor, inténtalo de nuevo.</p>
-      `;
-      form.appendChild(errorMessage);
 
-      setTimeout(() => {
-        errorMessage.classList.add('show');
-      }, 100);
-    } finally {
-      submitButton.classList.remove('loading');
-      submitButton.disabled = false;
+    // =============================================
+    // CONTADORES
+    // =============================================
+
+    function updateCounter(type, action) {
+
+        const input = type === 'adults'
+            ? elements.adultsInput
+            : elements.childrenInput;
+
+        if (!input) return;
+
+        let value = parseInt(input.value, 10) || 0;
+
+        if (action === 'increase' && value < MAX_ATTENDEES) {
+            value++;
+        }
+
+        if (action === 'decrease' && value > 0) {
+            value--;
+        }
+
+        input.value = value;
+
+        updateAttendees();
+
     }
-  }
 
-  /**
-   * Maneja el envío del formulario de autobús
-   */
-  async function handleBusSubmit(e) {
-    e.preventDefault();
-    const form = e.target;
-    const submitButton = form.querySelector('.submit-button');
-    
-    if (!validateForm(form)) return;
-    
-    submitButton.classList.add('loading');
-    submitButton.disabled = true;
 
-    try {
-      const formData = {
-        name: document.getElementById('bus-name').value,
-        email: document.getElementById('bus-email').value,
-        phone: document.getElementById('bus-phone').value,
-        timestamp: new Date().toISOString()
-      };
+    // =============================================
+    // CONSERVAR DATOS DE LOS ASISTENTES
+    // =============================================
 
-      await submitToGoogleSheet(formData, CONFIG.GOOGLE_SHEET.BUS_SHEET_NAME);
+    function getCurrentAttendees() {
 
-      const successMessage = document.createElement('div');
-      successMessage.className = 'form-success';
-      successMessage.innerHTML = `
-        <i class="fas fa-check-circle"></i>
-        <h3>¡Gracias!</h3>
-        <p>Tu reserva de autobús ha sido registrada correctamente.</p>
-        <p>Si vienes acompañado, rellena el formulario de nuevo con los datos de tu acompañante, por favor.</p>
-      `;
-      form.appendChild(successMessage);
+        const attendees = {};
 
-      setTimeout(() => {
-        successMessage.classList.add('show');
-      }, 100);
+        if (!elements.attendeesContainer) return attendees;
 
-      form.reset();
-    } catch (error) {
-      const errorMessage = document.createElement('div');
-      errorMessage.className = 'form-error';
-      errorMessage.innerHTML = `
-        <i class="fas fa-exclamation-circle"></i>
-        <h3>Error</h3>
-        <p>Hubo un problema al procesar tu reserva. Por favor, inténtalo de nuevo.</p>
-      `;
-      form.appendChild(errorMessage);
+        const groups = elements.attendeesContainer.querySelectorAll(
+            '[data-attendee-type][data-attendee-number]'
+        );
 
-      setTimeout(() => {
-        errorMessage.classList.add('show');
-      }, 100);
-    } finally {
-      submitButton.classList.remove('loading');
-      submitButton.disabled = false;
-    }
-  }
+        groups.forEach(group => {
 
-  /**
-   * Inicializa los formularios
-   */
-  function init() {
-    const forms = document.querySelectorAll('.form');
-    
-    forms.forEach(form => {
-      const fields = form.querySelectorAll('input, select, textarea');
-      
-      fields.forEach(field => {
-        field.addEventListener('blur', () => validateField(field));
-        field.addEventListener('input', () => {
-          if (field.classList.contains('invalid')) {
-            validateField(field);
-          }
+            const type = group.dataset.attendeeType;
+            const number = group.dataset.attendeeNumber;
+            const key = `${type}-${number}`;
+
+            attendees[key] = {
+                name: group.querySelector('[data-field="name"]')?.value || '',
+                menu: group.querySelector('[data-field="menu"]')?.value || '',
+                allergies: group.querySelector('[data-field="allergies"]')?.value || ''
+            };
+
         });
-      });
+
+        return attendees;
+    }
+
+
+    // =============================================
+    // GENERAR HTML DE UN ASISTENTE
+    // =============================================
+
+    function createAttendeeHTML(type, number, data = {}) {
+
+        const title = type === 'adult' ? 'Adulto' : 'Niño';
+
+        const index = type === 'adult'
+            ? number - 1
+            : parseInt(elements.adultsInput.value, 10) + number - 1;
+
+        const options = MENU_OPTIONS.map(option => `
+            <option
+                value="${option.value}"
+                ${data.menu === option.value ? 'selected' : ''}
+            >
+                ${option.label}
+            </option>
+        `).join('');
+
+        return `
+            <div data-attendee-type="${type}" data-attendee-number="${number}">
+
+                <h4>${title} ${number}</h4>
+
+                <div class="form-group">
+                    <input
+                        type="text"
+                        id="rsvp-attendee-${type}-${number}-name"
+                        name="attendees[${index}][name]"
+                        data-field="name"
+                        value="${escapeHTML(data.name || '')}"
+                        placeholder="Nombre y apellidos"
+                        required
+                    >
+                    <div class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <select
+                        id="rsvp-attendee-${type}-${number}-menu"
+                        name="attendees[${index}][menu]"
+                        data-field="menu"
+                        required
+                    >
+                        <option value="">Tipo de Menú</option>
+                        ${options}
+                    </select>
+                    <div class="error-message"></div>
+                </div>
+
+                <div class="form-group">
+                    <textarea
+                        id="rsvp-attendee-${type}-${number}-allergies"
+                        name="attendees[${index}][allergies]"
+                        data-field="allergies"
+                        placeholder="Alergias o Intolerancias"
+                    >${escapeHTML(data.allergies || '')}</textarea>
+                    <div class="error-message"></div>
+                </div>
+
+            </div>
+        `;
+    }
+
+
+    // =============================================
+    // GENERAR TODOS LOS ASISTENTES
+    // =============================================
+
+    function updateAttendees() {
+
+        if (!elements.attendeesContainer) return;
+
+        // Guardar los datos introducidos antes de regenerar
+        const previousData = getCurrentAttendees();
+
+        const adults = parseInt(elements.adultsInput.value, 10) || 0;
+        const children = parseInt(elements.childrenInput.value, 10) || 0;
+
+        let html = '';
+
+        // Generar adultos
+        for (let i = 1; i <= adults; i++) {
+
+            const key = `adult-${i}`;
+
+            html += createAttendeeHTML(
+                'adult',
+                i,
+                previousData[key] || {}
+            );
+
+        }
+
+        // Generar niños
+        for (let i = 1; i <= children; i++) {
+
+            const key = `child-${i}`;
+
+            html += createAttendeeHTML(
+                'child',
+                i,
+                previousData[key] || {}
+            );
+
+        }
+
+        elements.attendeesContainer.innerHTML = html;
+
+        // Limpiar error general del número de asistentes
+        if (elements.attendeesError) {
+            elements.attendeesError.textContent = '';
+            elements.attendeesError.classList.remove('show');
+        }
+
+    }
+
+
+    // =============================================
+    // ESCAPAR TEXTO PARA HTML
+    // =============================================
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+    }
+
+
+    // =============================================
+    // VALIDACIÓN DEL RSVP
+    // =============================================
+
+    function validateRsvpForm() {
+
+        const form = elements.rsvpForm;
+
+        let isValid = true;
+
+        // Validar datos de contacto
+        const contactFields = [
+            document.getElementById('rsvp-name'),
+            document.getElementById('rsvp-email'),
+            document.getElementById('rsvp-phone')
+        ];
+
+        contactFields.forEach(field => {
+
+            if (!field || !validateField(field)) {
+                isValid = false;
+            }
+
+        });
+
+        // Comprobar que haya al menos un asistente
+        const adults = parseInt(elements.adultsInput.value, 10) || 0;
+        const children = parseInt(elements.childrenInput.value, 10) || 0;
+
+        if (adults + children === 0) {
+
+            isValid = false;
+
+            if (elements.attendeesError) {
+                elements.attendeesError.textContent =
+                    'Debes indicar al menos una persona para confirmar la asistencia.';
+
+                elements.attendeesError.classList.add('show');
+            }
+
+        }
+
+        // Validar campos individuales
+        const attendeeFields = elements.attendeesContainer.querySelectorAll(
+            'input[required], select[required]'
+        );
+
+        attendeeFields.forEach(field => {
+
+            if (!validateField(field)) {
+                isValid = false;
+            }
+
+        });
+
+        return isValid;
+
+    }
+
+
+    // =============================================
+    // RECOGER DATOS DEL FORMULARIO RSVP
+    // =============================================
+
+    function collectRsvpData() {
+    const attendees = [];
+
+    const groups = elements.attendeesContainer.querySelectorAll(
+        '[data-attendee-type][data-attendee-number]'
+    );
+
+    groups.forEach(group => {
+        attendees.push({
+            name: group.querySelector('[data-field="name"]').value.trim(),
+            type: group.dataset.attendeeType === 'adult' ? 'Adulto' : 'Niño',
+            menu: group.querySelector('[data-field="menu"]').value,
+            allergies: group.querySelector('[data-field="allergies"]').value.trim()
+        });
     });
 
-    document.getElementById('rsvp-form')?.addEventListener('submit', handleRsvpSubmit);
-    document.getElementById('bus-form')?.addEventListener('submit', handleBusSubmit);
-  }
+    return {
+        contactName: document.getElementById('rsvp-name').value.trim(),
+        email: document.getElementById('rsvp-email').value.trim(),
+        phone: document.getElementById('rsvp-phone').value.trim(),
+        adults: parseInt(elements.adultsInput.value, 10),
+        children: parseInt(elements.childrenInput.value, 10),
+        attendees: attendees,
+        timestamp: new Date().toISOString()
+    };
+}
 
-  return { init };
+
+    // =============================================
+    // MENSAJES DE RESULTADO
+    // =============================================
+
+    function showFormMessage(form, type, title, message) {
+
+        // Evitar mensajes duplicados
+        form.querySelectorAll('.form-success, .form-error').forEach(element => {
+            element.remove();
+        });
+
+        const messageElement = document.createElement('div');
+
+        messageElement.className = type === 'success'
+            ? 'form-success'
+            : 'form-error';
+
+        const icon = type === 'success'
+            ? 'fa-check-circle'
+            : 'fa-exclamation-circle';
+
+        const iconElement = document.createElement('i');
+        iconElement.className = `fas ${icon}`;
+
+        const titleElement = document.createElement('h3');
+        titleElement.textContent = title;
+
+        const textElement = document.createElement('p');
+        textElement.textContent = message;
+
+        messageElement.append(
+            iconElement,
+            titleElement,
+            textElement
+        );
+
+        form.appendChild(messageElement);
+
+        setTimeout(() => {
+            messageElement.classList.add('show');
+        }, 100);
+
+    }
+
+
+    // =============================================
+    // ENVÍO DEL FORMULARIO RSVP
+    // =============================================
+
+    async function handleRsvpSubmit(event) {
+
+        event.preventDefault();
+
+        const form = event.target;
+        const submitButton = form.querySelector('.submit-button');
+
+        if (!validateRsvpForm()) return;
+
+        submitButton.classList.add('loading');
+        submitButton.disabled = true;
+
+        try {
+
+            const formData = collectRsvpData();
+
+            await submitToGoogleSheet(
+                formData,
+                CONFIG.GOOGLE_SHEET.RSVP_SHEET_NAME
+            );
+
+            showFormMessage(
+                form,
+                'success',
+                '¡Gracias!',
+                'Tu confirmación de asistencia ha sido enviada. ¡Nos vemos en la boda!'
+            );
+
+            // Reiniciar formulario
+            form.reset();
+
+            elements.adultsInput.value = 1;
+            elements.childrenInput.value = 0;
+
+            updateAttendees();
+
+        } catch (error) {
+
+            console.error('Error al enviar RSVP:', error);
+
+            showFormMessage(
+                form,
+                'error',
+                'Error',
+                'Hubo un problema al procesar tu confirmación. Por favor, inténtalo de nuevo.'
+            );
+
+        } finally {
+
+            submitButton.classList.remove('loading');
+            submitButton.disabled = false;
+
+        }
+
+    }
+
+
+    // =============================================
+    // ENVÍO DEL FORMULARIO DE AUTOBÚS
+    // =============================================
+
+    async function handleBusSubmit(event) {
+
+        event.preventDefault();
+
+        const form = event.target;
+        const submitButton = form.querySelector('.submit-button');
+
+        if (!validateForm(form)) return;
+
+        submitButton.classList.add('loading');
+        submitButton.disabled = true;
+
+        try {
+
+            const formData = {
+                name: document.getElementById('bus-name').value.trim(),
+                email: document.getElementById('bus-email').value.trim(),
+                phone: document.getElementById('bus-phone').value.trim(),
+                timestamp: new Date().toISOString()
+            };
+
+            await submitToGoogleSheet(
+                formData,
+                CONFIG.GOOGLE_SHEET.BUS_SHEET_NAME
+            );
+
+            showFormMessage(
+                form,
+                'success',
+                '¡Gracias!',
+                'Tu solicitud de reserva ha sido enviada correctamente.'
+            );
+
+            form.reset();
+
+        } catch (error) {
+
+            console.error('Error al enviar formulario de autobús:', error);
+
+            showFormMessage(
+                form,
+                'error',
+                'Error',
+                'Hubo un problema al procesar tu solicitud. Por favor, inténtalo de nuevo.'
+            );
+
+        } finally {
+
+            submitButton.classList.remove('loading');
+            submitButton.disabled = false;
+
+        }
+
+    }
+
+
+    // =============================================
+    // INICIALIZACIÓN
+    // =============================================
+
+    function init() {
+
+        // Comprobar que existe el formulario RSVP
+        if (elements.rsvpForm) {
+
+            // Generar inicialmente un adulto
+            updateAttendees();
+
+            // Gestionar contadores mediante delegación de eventos
+            elements.rsvpForm.addEventListener('click', event => {
+
+                const button = event.target.closest(
+                    '[data-counter][data-action]'
+                );
+
+                if (!button) return;
+
+                updateCounter(
+                    button.dataset.counter,
+                    button.dataset.action
+                );
+
+            });
+
+            // Envío RSVP
+            elements.rsvpForm.addEventListener(
+                'submit',
+                handleRsvpSubmit
+            );
+
+        }
+
+        // Mantener operativo el formulario de autobús
+        if (elements.busForm) {
+
+            elements.busForm.addEventListener(
+                'submit',
+                handleBusSubmit
+            );
+
+        }
+
+    }
+
+
+    return { init };
+
 })();
+
 
 const NavigationModule = (() => {
   /**
