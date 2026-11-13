@@ -1,6 +1,3 @@
-// =============================================
-// CONSTANTES Y CONFIGURACIONES
-// =============================================
 const CONFIG = {
   WEDDING_DATE: '2027-06-05T00:00:00',
   GOOGLE_SHEET: {
@@ -48,7 +45,7 @@ const CONFIG = {
 
 /**
  * Muestra un mensaje toast en la pantalla
- * @param {string} message - Mensaje a mostrar
+  @param {string} message - Mensaje a mostrar
  * @param {string} type - Tipo de mensaje (success, error, info)
  */
 function showToast(message, type = 'success') {
@@ -80,12 +77,12 @@ function validateField(field) {
   let isValid = true;
   let errorMessage = '';
 
-  // Validar campo requerido
+
   if (field.required && !value) {
     isValid = false;
     errorMessage = CONFIG.VALIDATION.ERROR_MESSAGES.required;
   } else if (value) {
-    // Validar según el tipo de campo
+
     switch (field.type) {
       case 'email':
         if (!CONFIG.VALIDATION.PATTERNS.email.test(value)) {
@@ -107,14 +104,14 @@ function validateField(field) {
         break;
     }
 
-    // Validar select
+  
     if (field.tagName === 'SELECT' && value === '') {
       isValid = false;
       errorMessage = CONFIG.VALIDATION.ERROR_MESSAGES.select;
     }
   }
 
-  // Actualizar UI
+
   if (!isValid) {
     field.classList.add('invalid');
     errorElement.textContent = errorMessage;
@@ -128,9 +125,9 @@ function validateField(field) {
 }
 
 /**
- * Valida un formulario completo
- * @param {HTMLFormElement} form - Formulario a validar
- * @returns {boolean} - True si todo el formulario es válido
+ * 
+ * @param {HTMLFormElement} form  
+ * @returns {boolean} 
  */
 function validateForm(form) {
   const fields = form.querySelectorAll('input, select, textarea');
@@ -146,10 +143,10 @@ function validateForm(form) {
 }
 
 /**
- * Maneja el envío de formularios a Google Sheets
- * @param {Object} formData - Datos del formulario
- * @param {string} sheetName - Nombre de la hoja de cálculo
- * @returns {Promise<Object>} - Resultado del envío
+ * 
+ * @param {Object} formData
+ * @param {string} sheetName 
+ * @returns {Promise<Object>}
  */
 async function submitToGoogleSheet(formData, sheetName) {
   try {
@@ -176,14 +173,10 @@ async function submitToGoogleSheet(formData, sheetName) {
   }
 }
 
-// =============================================
-// MÓDULOS PRINCIPALES
-// =============================================
+
 
 const CountdownModule = (() => {
-  /**
-   * Actualiza el contador regresivo
-   */
+ 
   function update() {
     const weddingDate = new Date(CONFIG.WEDDING_DATE);
     const now = new Date();
@@ -201,9 +194,9 @@ const CountdownModule = (() => {
   }
 
   /**
-   * Actualiza un valor del contador con animación
-   * @param {string} id - ID del elemento
-   * @param {number} value - Nuevo valor
+   * 
+   * @param {string} id
+   * @param {number} value
    */
   function updateValue(id, value) {
     const element = document.getElementById(id);
@@ -218,9 +211,7 @@ const CountdownModule = (() => {
     }
   }
 
-  /**
-   * Inicializa el módulo del contador
-   */
+  
   function init() {
     setTimeout(() => {
       update();
@@ -241,25 +232,19 @@ const ChatModule = (() => {
     questionsContainer: document.querySelector('.predefined-questions')
   };
 
-  /**
-   * Muestra el chat
-   */
+ 
   function show() {
     elements.chatBox.classList.add('visible');
     document.querySelector('.chat-overlay').classList.add('visible');
   }
 
-  /**
-   * Oculta el chat
-   */
+  
   function hide() {
     elements.chatBox.classList.remove('visible');
     document.querySelector('.chat-overlay').classList.remove('visible');
   }
 
-  /**
-   * Muestra las preguntas disponibles
-   */
+ 
   function showAvailableQuestions() {
     elements.questionsContainer.innerHTML = '';
     
@@ -275,24 +260,24 @@ const ChatModule = (() => {
   }
 
   /**
-   * Maneja el clic en una pregunta
-   * @param {string} question - Pregunta seleccionada
+   * 
+   * @param {string} question
    */
   function handleQuestionClick(question) {
     const answer = CONFIG.CHAT.QA_MAP[question];
     
-    // Añadir pregunta del usuario
+    
     const userMessage = document.createElement('div');
     userMessage.className = 'message user';
     userMessage.textContent = question;
     elements.chatMessages.appendChild(userMessage);
     
-    // Simular "escribiendo..."
+    
     const typingMessage = document.createElement('div');
     typingMessage.className = 'message bot typing';
     elements.chatMessages.appendChild(typingMessage);
     
-    // Mostrar respuesta después de un delay
+    
     setTimeout(() => {
       elements.chatMessages.removeChild(typingMessage);
       const botMessage = document.createElement('div');
@@ -306,7 +291,7 @@ const ChatModule = (() => {
   }
 
   /**
-   * Muestra las preguntas restantes
+   * 
    */
   function showRemainingQuestions() {
     const remainingQuestionsContainer = document.createElement('div');
@@ -346,16 +331,14 @@ const ChatModule = (() => {
     }, 100);
   }
 
-  /**
-   * Inicializa el módulo del chat
-   */
+ 
   function init() {
-    // Crear overlay
+   
     const overlay = document.createElement('div');
     overlay.className = 'chat-overlay';
     document.body.appendChild(overlay);
 
-    // Event listeners
+    
     elements.chatToggle.addEventListener('click', show);
     elements.closeChat.addEventListener('click', hide);
     overlay.addEventListener('click', hide);
@@ -376,8 +359,8 @@ const GalleryModule = (() => {
   let currentIndex = 0;
 
   /**
-   * Actualiza la galería con la imagen seleccionada
-   * @param {number} index - Índice de la imagen a mostrar
+   * 
+   * @param {number} index
    */
   function update(index) {
     elements.main.src = elements.thumbnails[index].src;
@@ -390,9 +373,7 @@ const GalleryModule = (() => {
     currentIndex = index;
   }
 
-  /**
-   * Inicializa el módulo de la galería
-   */
+ 
   function init() {
     elements.thumbnails.forEach((thumb, index) => {
       thumb.addEventListener('click', () => update(index));
@@ -416,7 +397,7 @@ const GalleryModule = (() => {
       }
     });
 
-    // Efectos hover
+   
     elements.thumbnails.forEach(thumb => {
       thumb.addEventListener('mouseenter', () => {
         thumb.style.opacity = '0.8';
@@ -441,8 +422,8 @@ const StoryCarouselModule = (() => {
   let currentIndex = 0;
 
   /**
-   * Muestra un momento específico del carrusel
-   * @param {number} index - Índice del momento a mostrar
+   * 
+   * @param {number} index
    */
   function showMoment(index) {
     elements.moments.forEach((moment, i) => {
@@ -455,9 +436,7 @@ const StoryCarouselModule = (() => {
     relocateNavigation();
   }
 
-  /**
-   * Reubica la navegación según el dispositivo
-   */
+ 
   function relocateNavigation() {
     const isMobile = window.innerWidth <= 768;
     const activeMoment = document.querySelector('.story-moment.active');
@@ -476,9 +455,7 @@ const StoryCarouselModule = (() => {
     }
   }
 
-  /**
-   * Maneja eventos de swipe
-   */
+ 
   function handleSwipe() {
     let touchStartX = 0;
     let touchEndX = 0;
@@ -503,9 +480,7 @@ const StoryCarouselModule = (() => {
     });
   }
 
-  /**
-   * Inicializa el módulo del carrusel
-   */
+ 
   function init() {
     elements.prevBtn.addEventListener('click', () => {
       const newIndex = (currentIndex - 1 + elements.moments.length) % elements.moments.length;
@@ -541,9 +516,6 @@ const StoryCarouselModule = (() => {
 
 const FormModule = (() => {
 
-    // =============================================
-    // ELEMENTOS Y CONFIGURACIÓN
-    // =============================================
 
     const elements = {
         rsvpForm: document.getElementById('rsvp-form'),
@@ -563,9 +535,6 @@ const FormModule = (() => {
     ];
 
 
-    // =============================================
-    // CONTADORES
-    // =============================================
 
     function updateCounter(type, action) {
 
@@ -592,10 +561,7 @@ const FormModule = (() => {
     }
 
 
-    // =============================================
-    // CONSERVAR DATOS DE LOS ASISTENTES
-    // =============================================
-
+  
     function getCurrentAttendees() {
 
         const attendees = {};
@@ -624,9 +590,7 @@ const FormModule = (() => {
     }
 
 
-    // =============================================
-    // GENERAR HTML DE UN ASISTENTE
-    // =============================================
+
 
     function createAttendeeHTML(type, number, data = {}) {
 
@@ -691,9 +655,7 @@ const FormModule = (() => {
     }
 
 
-    // =============================================
-    // GENERAR TODOS LOS ASISTENTES
-    // =============================================
+  
 
     function updateAttendees() {
 
@@ -707,7 +669,7 @@ const FormModule = (() => {
 
         let html = '';
 
-        // Generar adultos
+       
         for (let i = 1; i <= adults; i++) {
 
             const key = `adult-${i}`;
@@ -720,7 +682,7 @@ const FormModule = (() => {
 
         }
 
-        // Generar niños
+     
         for (let i = 1; i <= children; i++) {
 
             const key = `child-${i}`;
@@ -735,7 +697,7 @@ const FormModule = (() => {
 
         elements.attendeesContainer.innerHTML = html;
 
-        // Limpiar error general del número de asistentes
+       
         if (elements.attendeesError) {
             elements.attendeesError.textContent = '';
             elements.attendeesError.classList.remove('show');
@@ -743,10 +705,6 @@ const FormModule = (() => {
 
     }
 
-
-    // =============================================
-    // ESCAPAR TEXTO PARA HTML
-    // =============================================
 
     function escapeHTML(value) {
 
@@ -760,9 +718,7 @@ const FormModule = (() => {
     }
 
 
-    // =============================================
-    // VALIDACIÓN DEL RSVP
-    // =============================================
+   
 
     function validateRsvpForm() {
 
@@ -770,7 +726,7 @@ const FormModule = (() => {
 
         let isValid = true;
 
-        // Validar datos de contacto
+        
         const contactFields = [
             document.getElementById('rsvp-name'),
             document.getElementById('rsvp-email'),
@@ -785,7 +741,7 @@ const FormModule = (() => {
 
         });
 
-        // Comprobar que haya al menos un asistente
+        
         const adults = parseInt(elements.adultsInput.value, 10) || 0;
         const children = parseInt(elements.childrenInput.value, 10) || 0;
 
@@ -802,7 +758,7 @@ const FormModule = (() => {
 
         }
 
-        // Validar campos individuales
+        
         const attendeeFields = elements.attendeesContainer.querySelectorAll(
             'input[required], select[required]'
         );
@@ -820,9 +776,7 @@ const FormModule = (() => {
     }
 
 
-    // =============================================
-    // RECOGER DATOS DEL FORMULARIO RSVP
-    // =============================================
+   
 
     function collectRsvpData() {
     const attendees = [];
@@ -852,13 +806,11 @@ const FormModule = (() => {
 }
 
 
-    // =============================================
-    // MENSAJES DE RESULTADO
-    // =============================================
+ 
 
     function showFormMessage(form, type, title, message) {
 
-        // Evitar mensajes duplicados
+        
         form.querySelectorAll('.form-success, .form-error').forEach(element => {
             element.remove();
         });
@@ -897,9 +849,7 @@ const FormModule = (() => {
     }
 
 
-    // =============================================
-    // ENVÍO DEL FORMULARIO RSVP
-    // =============================================
+
 
     async function handleRsvpSubmit(event) {
 
@@ -929,7 +879,7 @@ const FormModule = (() => {
                 'Tu confirmación de asistencia ha sido enviada. ¡Nos vemos en la boda!'
             );
 
-            // Reiniciar formulario
+           
             form.reset();
 
             elements.adultsInput.value = 1;
@@ -958,9 +908,7 @@ const FormModule = (() => {
     }
 
 
-    // =============================================
-    // ENVÍO DEL FORMULARIO DE AUTOBÚS
-    // =============================================
+   
 
     async function handleBusSubmit(event) {
 
@@ -1018,19 +966,17 @@ const FormModule = (() => {
     }
 
 
-    // =============================================
-    // INICIALIZACIÓN
-    // =============================================
+   
 
     function init() {
 
-        // Comprobar que existe el formulario RSVP
+        
         if (elements.rsvpForm) {
 
-            // Generar inicialmente un adulto
+           
             updateAttendees();
 
-            // Gestionar contadores mediante delegación de eventos
+           
             elements.rsvpForm.addEventListener('click', event => {
 
                 const button = event.target.closest(
@@ -1046,7 +992,7 @@ const FormModule = (() => {
 
             });
 
-            // Envío RSVP
+            
             elements.rsvpForm.addEventListener(
                 'submit',
                 handleRsvpSubmit
@@ -1054,7 +1000,7 @@ const FormModule = (() => {
 
         }
 
-        // Mantener operativo el formulario de autobús
+        
         if (elements.busForm) {
 
             elements.busForm.addEventListener(
@@ -1073,9 +1019,7 @@ const FormModule = (() => {
 
 
 const NavigationModule = (() => {
-  /**
-   * Maneja el scroll de la página
-   */
+  
   function handleScroll() {
     const currentScroll = window.pageYOffset;
     const mainNav = document.querySelector('.main-nav');
@@ -1087,9 +1031,7 @@ const NavigationModule = (() => {
     }
   }
 
-  /**
-   * Inicializa el menú hamburguesa
-   */
+  
   function initHamburgerMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
@@ -1123,9 +1065,7 @@ const NavigationModule = (() => {
     });
   }
 
-  /**
-   * Inicializa el scroll suave
-   */
+  
   function initSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function(e) {
@@ -1141,9 +1081,7 @@ const NavigationModule = (() => {
     });
   }
 
-  /**
-   * Inicializa el botón de volver arriba
-   */
+ 
   function initBackToTop() {
     const backToTop = document.getElementById('back-to-top');
     if (!backToTop) return;
@@ -1156,9 +1094,7 @@ const NavigationModule = (() => {
     });
   }
 
-  /**
-   * Inicializa el módulo de navegación
-   */
+  
   function init() {
     initHamburgerMenu();
     initSmoothScroll();
@@ -1171,9 +1107,7 @@ const NavigationModule = (() => {
 })();
 
 const ParallaxModule = (() => {
-  /**
-   * Maneja el efecto parallax
-   */
+  
   function handleParallax() {
     const hero = document.querySelector('.hero');
     if (!hero) return;
@@ -1187,9 +1121,7 @@ const ParallaxModule = (() => {
     }
   }
 
-  /**
-   * Inicializa el módulo parallax
-   */
+  
   function init() {
     window.addEventListener('scroll', handleParallax);
     window.addEventListener('resize', handleParallax);
@@ -1199,9 +1131,7 @@ const ParallaxModule = (() => {
 })();
 
 const TimelineModule = (() => {
-  /**
-   * Inicializa el observador de intersección para el timeline
-   */
+
   function init() {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -1224,11 +1154,9 @@ const TimelineModule = (() => {
 })();
 
 const MicroInteractionsModule = (() => {
-  /**
-   * Inicializa las micro-interacciones
-   */
+ 
   function init() {
-    // Efecto hover en botones
+    
     const buttons = document.querySelectorAll('.submit-button, .booking-button');
     buttons.forEach(button => {
       button.addEventListener('mouseenter', () => {
@@ -1239,7 +1167,7 @@ const MicroInteractionsModule = (() => {
       });
     });
 
-    // Efecto hover en cards
+    
     const cards = document.querySelectorAll('.timeline-item, .venue-details, .venue-map, .venue-gallery, .hotel-booking');
     cards.forEach(card => {
       card.addEventListener('mouseenter', () => {
@@ -1252,7 +1180,7 @@ const MicroInteractionsModule = (() => {
       });
     });
 
-    // Efecto hover en iconos
+    
     const icons = document.querySelectorAll('.timeline-icon, .venue-info i, .booking-notes i');
     icons.forEach(icon => {
       icon.addEventListener('mouseenter', () => {
@@ -1265,7 +1193,7 @@ const MicroInteractionsModule = (() => {
       });
     });
 
-    // Efecto hover en botón de volver arriba
+    
     const backToTop = document.getElementById('back-to-top');
     if (backToTop) {
       backToTop.addEventListener('mouseenter', () => {
@@ -1276,7 +1204,7 @@ const MicroInteractionsModule = (() => {
       });
     }
 
-    // Efecto hover en botón de chat
+    
     const chatToggle = document.getElementById('chat-toggle');
     if (chatToggle) {
       chatToggle.addEventListener('mouseenter', () => {
@@ -1287,7 +1215,7 @@ const MicroInteractionsModule = (() => {
       });
     }
 
-    // Efecto hover en botón de copiar cuenta
+    
     const copyButton = document.querySelector('.account-number i');
     if (copyButton) {
       copyButton.addEventListener('mouseenter', () => {
@@ -1303,9 +1231,7 @@ const MicroInteractionsModule = (() => {
 })();
 
 const AccountModule = (() => {
-  /**
-   * Copia el número de cuenta al portapapeles
-   */
+  
   function copyAccountNumber() {
     const accountNumber = document.querySelector('.account-number').textContent.trim();
     const icon = document.querySelector('.account-number i');
@@ -1323,9 +1249,7 @@ const AccountModule = (() => {
     });
   }
 
-  /**
-   * Inicializa el módulo de cuenta
-   */
+ 
   function init() {
     const copyButton = document.querySelector('.account-number i');
     if (copyButton) {
@@ -1336,12 +1260,9 @@ const AccountModule = (() => {
   return { init };
 })();
 
-// =============================================
-// INICIALIZACIÓN DE LA APLICACIÓN
-// =============================================
+
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Inicializar todos los módulos
   CountdownModule.init();
   ChatModule.init();
   GalleryModule.init();
