@@ -514,12 +514,24 @@ const StoryCarouselModule = (() => {
 })();
 
 
+
 const FormModule = (() => {
 
+    // =============================================
+    // ELEMENTOS DEL DOM
+    // =============================================
 
     const elements = {
         rsvpForm: document.getElementById('rsvp-form'),
+        rsvpSection: document.querySelector('.rsvp-form'),
+
+        busSection: document.getElementById('rsvp-bus'),
         busForm: document.getElementById('bus-form'),
+        busDetails: document.getElementById('bus-details'),
+        busChoices: document.querySelector('.bus-choices'),
+        busAttendeesContainer: document.getElementById('bus-attendees-container'),
+        busMessage: document.getElementById('bus-message'),
+
         adultsInput: document.getElementById('rsvp-adults'),
         childrenInput: document.getElementById('rsvp-children'),
         attendeesContainer: document.getElementById('attendees-container'),
@@ -534,7 +546,34 @@ const FormModule = (() => {
         { value: 'vegano', label: 'Menú Vegano' }
     ];
 
+    // Datos conservados durante todo el proceso.
+    let rsvpData = null;
+    let busGuests = [];
 
+
+    // =============================================
+    // IDENTIFICADORES
+    // =============================================
+
+    function generateGroupId() {
+
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+            return window.crypto.randomUUID()
+                .replace(/-/g, '')
+                .substring(0, 8)
+                .toUpperCase();
+        }
+
+        return 'xxxxxxxx'.replace(/[x]/g, () =>
+            Math.floor(Math.random() * 16).toString(16)
+        ).toUpperCase();
+
+    }
+
+
+    // =============================================
+    // CONTADORES RSVP
+    // =============================================
 
     function updateCounter(type, action) {
 
@@ -561,7 +600,10 @@ const FormModule = (() => {
     }
 
 
-  
+    // =============================================
+    // RECUPERAR ASISTENTES RSVP
+    // =============================================
+
     function getCurrentAttendees() {
 
         const attendees = {};
@@ -587,10 +629,13 @@ const FormModule = (() => {
         });
 
         return attendees;
+
     }
 
 
-
+    // =============================================
+    // GENERAR HTML DE CADA ASISTENTE RSVP
+    // =============================================
 
     function createAttendeeHTML(type, number, data = {}) {
 
@@ -652,16 +697,18 @@ const FormModule = (() => {
 
             </div>
         `;
+
     }
 
 
-  
+    // =============================================
+    // ACTUALIZAR ASISTENTES RSVP
+    // =============================================
 
     function updateAttendees() {
 
         if (!elements.attendeesContainer) return;
 
-        // Guardar los datos introducidos antes de regenerar
         const previousData = getCurrentAttendees();
 
         const adults = parseInt(elements.adultsInput.value, 10) || 0;
@@ -669,7 +716,6 @@ const FormModule = (() => {
 
         let html = '';
 
-       
         for (let i = 1; i <= adults; i++) {
 
             const key = `adult-${i}`;
@@ -682,7 +728,6 @@ const FormModule = (() => {
 
         }
 
-     
         for (let i = 1; i <= children; i++) {
 
             const key = `child-${i}`;
@@ -697,7 +742,6 @@ const FormModule = (() => {
 
         elements.attendeesContainer.innerHTML = html;
 
-       
         if (elements.attendeesError) {
             elements.attendeesError.textContent = '';
             elements.attendeesError.classList.remove('show');
@@ -705,6 +749,10 @@ const FormModule = (() => {
 
     }
 
+
+    // =============================================
+    // ESCAPAR HTML
+    // =============================================
 
     function escapeHTML(value) {
 
@@ -718,15 +766,14 @@ const FormModule = (() => {
     }
 
 
-   
+    // =============================================
+    // VALIDACIÓN RSVP
+    // =============================================
 
     function validateRsvpForm() {
 
-        const form = elements.rsvpForm;
-
         let isValid = true;
 
-        
         const contactFields = [
             document.getElementById('rsvp-name'),
             document.getElementById('rsvp-email'),
@@ -741,7 +788,6 @@ const FormModule = (() => {
 
         });
 
-        
         const adults = parseInt(elements.adultsInput.value, 10) || 0;
         const children = parseInt(elements.childrenInput.value, 10) || 0;
 
@@ -758,7 +804,6 @@ const FormModule = (() => {
 
         }
 
-        
         const attendeeFields = elements.attendeesContainer.querySelectorAll(
             'input[required], select[required]'
         );
@@ -776,44 +821,55 @@ const FormModule = (() => {
     }
 
 
-   
+    // =============================================
+    // RECOGER DATOS RSVP
+    // =============================================
 
     function collectRsvpData() {
-    const attendees = [];
 
-    const groups = elements.attendeesContainer.querySelectorAll(
-        '[data-attendee-type][data-attendee-number]'
-    );
+        const attendees = [];
 
-    groups.forEach(group => {
-        attendees.push({
-            name: group.querySelector('[data-field="name"]').value.trim(),
-            type: group.dataset.attendeeType === 'adult' ? 'Adulto' : 'Niño',
-            menu: group.querySelector('[data-field="menu"]').value,
-            allergies: group.querySelector('[data-field="allergies"]').value.trim()
+        const groups = elements.attendeesContainer.querySelectorAll(
+            '[data-attendee-type][data-attendee-number]'
+        );
+
+        groups.forEach(group => {
+
+            attendees.push({
+                name: group.querySelector('[data-field="name"]').value.trim(),
+                type: group.dataset.attendeeType === 'adult'
+                    ? 'Adulto'
+                    : 'Niño',
+                menu: group.querySelector('[data-field="menu"]').value,
+                allergies: group.querySelector('[data-field="allergies"]').value.trim()
+            });
+
         });
-    });
 
-    return {
-        contactName: document.getElementById('rsvp-name').value.trim(),
-        email: document.getElementById('rsvp-email').value.trim(),
-        phone: document.getElementById('rsvp-phone').value.trim(),
-        adults: parseInt(elements.adultsInput.value, 10),
-        children: parseInt(elements.childrenInput.value, 10),
-        attendees: attendees,
-        timestamp: new Date().toISOString()
-    };
-}
+        return {
+            groupId: generateGroupId(),
+            contactName: document.getElementById('rsvp-name').value.trim(),
+            email: document.getElementById('rsvp-email').value.trim(),
+            phone: document.getElementById('rsvp-phone').value.trim(),
+            adults: parseInt(elements.adultsInput.value, 10),
+            children: parseInt(elements.childrenInput.value, 10),
+            attendees: attendees,
+            timestamp: new Date().toISOString()
+        };
+
+    }
 
 
- 
+    // =============================================
+    // MOSTRAR MENSAJES
+    // =============================================
 
-    function showFormMessage(form, type, title, message) {
+    function showMessage(container, type, title, message) {
 
-        
-        form.querySelectorAll('.form-success, .form-error').forEach(element => {
-            element.remove();
-        });
+        if (!container) return;
+
+        container.querySelectorAll('.form-success, .form-error')
+            .forEach(element => element.remove());
 
         const messageElement = document.createElement('div');
 
@@ -821,12 +877,11 @@ const FormModule = (() => {
             ? 'form-success'
             : 'form-error';
 
-        const icon = type === 'success'
-            ? 'fa-check-circle'
-            : 'fa-exclamation-circle';
-
         const iconElement = document.createElement('i');
-        iconElement.className = `fas ${icon}`;
+
+        iconElement.className = type === 'success'
+            ? 'fas fa-check-circle'
+            : 'fas fa-exclamation-circle';
 
         const titleElement = document.createElement('h3');
         titleElement.textContent = title;
@@ -840,7 +895,7 @@ const FormModule = (() => {
             textElement
         );
 
-        form.appendChild(messageElement);
+        container.appendChild(messageElement);
 
         setTimeout(() => {
             messageElement.classList.add('show');
@@ -849,7 +904,206 @@ const FormModule = (() => {
     }
 
 
+    // =============================================
+    // MOSTRAR FORMULARIO DE ALOJAMIENTO
+    // =============================================
 
+    function showBusSection() {
+
+        elements.rsvpForm.hidden = true;
+        elements.busSection.hidden = false;
+
+        elements.busSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+
+    }
+
+
+    // =============================================
+    // GENERAR LISTA DE HUÉSPEDES
+    // =============================================
+
+    function renderBusGuests() {
+
+        if (!elements.busAttendeesContainer) return;
+
+        elements.busAttendeesContainer.innerHTML = '';
+
+        busGuests.forEach((guest, index) => {
+
+            const guestElement = document.createElement('div');
+
+            guestElement.className = 'bus-attendee';
+
+            const input = document.createElement('input');
+
+            input.type = 'text';
+            input.className = 'bus-attendee-name';
+            input.value = guest.name;
+            input.placeholder = 'Nombre y apellidos';
+            input.required = true;
+            input.dataset.guestIndex = index;
+
+            input.addEventListener('input', () => {
+                busGuests[index].name = input.value;
+            });
+
+            const removeButton = document.createElement('button');
+
+            removeButton.type = 'button';
+            removeButton.className = 'bus-remove-attendee';
+            removeButton.textContent = 'Eliminar';
+            removeButton.setAttribute(
+                'aria-label',
+                `Eliminar a ${guest.name}`
+            );
+
+            removeButton.addEventListener('click', () => {
+
+                busGuests.splice(index, 1);
+
+                renderBusGuests();
+
+            });
+
+            guestElement.append(input, removeButton);
+
+            elements.busAttendeesContainer.appendChild(guestElement);
+
+        });
+
+    }
+
+
+    // =============================================
+    // SELECCIÓN DE OPCIÓN DE ALOJAMIENTO
+    // =============================================
+
+    function handleBusChoice(choice) {
+
+        elements.busChoices.querySelectorAll('.bus-choice')
+            .forEach(button => {
+                button.classList.toggle(
+                    'active',
+                    button.dataset.busChoice === choice
+                );
+            });
+
+        elements.busMessage.innerHTML = '';
+
+        // -----------------------------------------
+        // NO NECESITA ALOJAMIENTO
+        // -----------------------------------------
+
+        if (choice === 'no') {
+
+            elements.busDetails.hidden = true;
+
+            showMessage(
+                elements.busMessage,
+                'success',
+                '¡Perfecto!',
+                'Tu confirmación de asistencia ha quedado registrada. ¡Nos vemos en la boda!'
+            );
+
+            return;
+
+        }
+
+        // -----------------------------------------
+        // COPIAR LOS ASISTENTES DEL RSVP
+        // -----------------------------------------
+
+        busGuests = rsvpData.attendees.map(attendee => ({
+            name: attendee.name,
+            type: attendee.type
+        }));
+
+        // -----------------------------------------
+        // MOSTRAR LISTA EDITABLE
+        // -----------------------------------------
+
+        renderBusGuests();
+
+        elements.busDetails.hidden = false;
+
+        if (choice === 'same') {
+
+            elements.busAttendeesContainer.querySelectorAll('input')
+                .forEach(input => {
+                    input.readOnly = true;
+                });
+
+            elements.busAttendeesContainer.querySelectorAll(
+                '.bus-remove-attendee'
+            ).forEach(button => {
+                button.hidden = true;
+            });
+
+        } else {
+
+            elements.busAttendeesContainer.querySelectorAll('input')
+                .forEach(input => {
+                    input.readOnly = false;
+                });
+
+            elements.busAttendeesContainer.querySelectorAll(
+                '.bus-remove-attendee'
+            ).forEach(button => {
+                button.hidden = false;
+            });
+
+        }
+
+    }
+
+
+    // =============================================
+    // VALIDAR HUÉSPEDES BUS
+    // =============================================
+
+    function validateBusGuests() {
+
+        if (busGuests.length === 0) {
+
+            showMessage(
+                elements.busMessage,
+                'error',
+                'Faltan huéspedes',
+                'Debes indicar al menos una persona que necesite alojamiento.'
+            );
+
+            return false;
+
+        }
+
+        const hasEmptyName = busGuests.some(guest =>
+            !guest.name || !guest.name.trim()
+        );
+
+        if (hasEmptyName) {
+
+            showMessage(
+                elements.busMessage,
+                'error',
+                'Revisa los nombres',
+                'Todos los huéspedes deben tener un nombre.'
+            );
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
+
+    // =============================================
+    // ENVIAR RSVP
+    // =============================================
 
     async function handleRsvpSubmit(event) {
 
@@ -865,34 +1119,28 @@ const FormModule = (() => {
 
         try {
 
-            const formData = collectRsvpData();
+            rsvpData = collectRsvpData();
 
             await submitToGoogleSheet(
-                formData,
+                rsvpData,
                 CONFIG.GOOGLE_SHEET.RSVP_SHEET_NAME
             );
 
-            showFormMessage(
-                form,
+            showMessage(
+                elements.rsvpSection,
                 'success',
                 '¡Gracias!',
-                'Tu confirmación de asistencia ha sido enviada. ¡Nos vemos en la boda!'
+                'Tu confirmación de asistencia ha sido enviada. Ahora puedes indicar si necesitas alojamiento.'
             );
 
-           
-            form.reset();
-
-            elements.adultsInput.value = 1;
-            elements.childrenInput.value = 0;
-
-            updateAttendees();
+            showBusSection();
 
         } catch (error) {
 
             console.error('Error al enviar RSVP:', error);
 
-            showFormMessage(
-                form,
+            showMessage(
+                elements.rsvpSection,
                 'error',
                 'Error',
                 'Hubo un problema al procesar tu confirmación. Por favor, inténtalo de nuevo.'
@@ -908,7 +1156,9 @@ const FormModule = (() => {
     }
 
 
-   
+    // =============================================
+    // ENVIAR RESERVA BUS
+    // =============================================
 
     async function handleBusSubmit(event) {
 
@@ -917,7 +1167,7 @@ const FormModule = (() => {
         const form = event.target;
         const submitButton = form.querySelector('.submit-button');
 
-        if (!validateForm(form)) return;
+        if (!validateBusGuests()) return;
 
         submitButton.classList.add('loading');
         submitButton.disabled = true;
@@ -925,9 +1175,15 @@ const FormModule = (() => {
         try {
 
             const formData = {
-                name: document.getElementById('bus-name').value.trim(),
-                email: document.getElementById('bus-email').value.trim(),
-                phone: document.getElementById('bus-phone').value.trim(),
+                groupId: generateGroupId(),
+                rsvpGroupId: rsvpData.groupId,
+                contactName: rsvpData.contactName,
+                email: rsvpData.email,
+                phone: rsvpData.phone,
+                guests: busGuests.map(guest => ({
+                    name: guest.name.trim(),
+                    type: guest.type
+                })),
                 timestamp: new Date().toISOString()
             };
 
@@ -936,24 +1192,25 @@ const FormModule = (() => {
                 CONFIG.GOOGLE_SHEET.BUS_SHEET_NAME
             );
 
-            showFormMessage(
-                form,
-                'success',
-                '¡Gracias!',
-                'Tu solicitud de reserva ha sido enviada correctamente.'
-            );
+            elements.busForm.hidden = true;
+            elements.busChoices.hidden = true;
 
-            form.reset();
+            showMessage(
+                elements.busMessage,
+                'success',
+                '¡Reserva confirmada!',
+                'Hemos recibido correctamente vuestra solicitud de alojamiento. ¡Muchas gracias!'
+            );
 
         } catch (error) {
 
-            console.error('Error al enviar formulario de autobús:', error);
+            console.error('Error al enviar reserva BUS:', error);
 
-            showFormMessage(
-                form,
+            showMessage(
+                elements.busMessage,
                 'error',
                 'Error',
-                'Hubo un problema al procesar tu solicitud. Por favor, inténtalo de nuevo.'
+                'Hubo un problema al procesar vuestra reserva. Por favor, inténtalo de nuevo.'
             );
 
         } finally {
@@ -966,17 +1223,17 @@ const FormModule = (() => {
     }
 
 
-   
+    // =============================================
+    // INICIALIZACIÓN
+    // =============================================
 
     function init() {
 
-        
+        // Inicializar asistentes RSVP.
         if (elements.rsvpForm) {
 
-           
             updateAttendees();
 
-           
             elements.rsvpForm.addEventListener('click', event => {
 
                 const button = event.target.closest(
@@ -992,7 +1249,6 @@ const FormModule = (() => {
 
             });
 
-            
             elements.rsvpForm.addEventListener(
                 'submit',
                 handleRsvpSubmit
@@ -1000,7 +1256,22 @@ const FormModule = (() => {
 
         }
 
-        
+        // Inicializar opciones de alojamiento.
+        if (elements.busChoices) {
+
+            elements.busChoices.addEventListener('click', event => {
+
+                const button = event.target.closest('[data-bus-choice]');
+
+                if (!button) return;
+
+                handleBusChoice(button.dataset.busChoice);
+
+            });
+
+        }
+
+        // Inicializar envío BUS.
         if (elements.busForm) {
 
             elements.busForm.addEventListener(
@@ -1016,6 +1287,7 @@ const FormModule = (() => {
     return { init };
 
 })();
+
 
 
 const NavigationModule = (() => {

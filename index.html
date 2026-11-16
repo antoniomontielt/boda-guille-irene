@@ -302,35 +302,17 @@
     <form id="rsvp-form" class="form" novalidate>
 
         <div class="form-group">
-            <input
-                type="text"
-                id="rsvp-name"
-                name="contactName"
-                placeholder="Nombre de la persona de contacto"
-                required
-            >
+            <input type="text" id="rsvp-name" name="contactName" placeholder="Nombre de la persona de contacto" required>
             <div class="error-message"></div>
         </div>
 
         <div class="form-group">
-            <input
-                type="email"
-                id="rsvp-email"
-                name="email"
-                placeholder="Email"
-                required
-            >
+            <input type="email" id="rsvp-email" name="email" placeholder="Email" required>
             <div class="error-message"></div>
         </div>
 
         <div class="form-group">
-            <input
-                type="tel"
-                id="rsvp-phone"
-                name="phone"
-                placeholder="Teléfono"
-                required
-            >
+            <input type="tel" id="rsvp-phone" name="phone" placeholder="Teléfono" required>
             <div class="error-message"></div>
         </div>
 
@@ -343,15 +325,7 @@
                 <div>
                     <button class="counter-button" type="button" data-counter="adults" data-action="decrease">−</button>
 
-                    <input
-                    type="number"
-                    id="rsvp-adults"
-                    name="adults"
-                    value="1"
-                    min="0"
-                    max="20"
-                    readonly
-                    >
+                    <input type="number" id="rsvp-adults" name="adults" value="1" min="0" max="20" readonly>
 
                     <button class="counter-button" type="button" data-counter="adults" data-action="increase">+</button>
                 </div>
@@ -363,15 +337,7 @@
                 <div>
                     <button class="counter-button" type="button" data-counter="children" data-action="decrease">−</button>
 
-                    <input
-                    type="number"
-                    id="rsvp-children"
-                    name="children"
-                    value="0"
-                    min="0"
-                    max="20"
-                    readonly
-                    >
+                    <input type="number" id="rsvp-children" name="children" value="0" min="0" max="20" readonly>
 
                     <button class="counter-button" type="button" data-counter="children" data-action="increase">+</button>
                 </div>
@@ -398,29 +364,65 @@
 </div>
 
 
-                <div class="bus-form" id="rsvp-bus">
-                    <h3>Me quiero quedar a dormir</h3>
-                    <form id="bus-form" class="form" novalidate>
-                        <div class="form-group">
-                            <input type="text" id="bus-name" name="name" placeholder="Nombre" required>
-                            <div class="error-message"></div>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" id="bus-email" name="email" placeholder="Email" required>
-                            <div class="error-message"></div>
-                        </div>
-                        <div class="form-group">
-                            <input type="tel" id="bus-phone" name="phone" placeholder="Teléfono" required>
-                            <div class="error-message"></div>
-                        </div>
-                        <button type="submit" class="submit-button">
-                            <span class="button-text">Reservar Plaza</span>
-                            <i class="fas fa-spinner fa-spin"></i>
-                        </button>
-                    </form>
-                </div>
+               
+<div class="form" id="rsvp-bus" hidden>
+    <h3>¿Os queréis quedar a dormir?</h3>
+
+    <p>Indicad quiénes necesitaréis alojamiento.</p>
+
+    <div class="bus-choices">
+        <button
+            type="button"
+            class="bus-choice"
+            data-bus-choice="same"
+        >
+            Sí, los mismos datos
+        </button>
+
+        <button
+            type="button"
+            class="bus-choice"
+            data-bus-choice="edit"
+        >
+            Sí, quiero modificar los datos
+        </button>
+
+        <button
+            type="button"
+            class="bus-choice"
+            data-bus-choice="no"
+        >
+            No necesitamos alojamiento
+        </button>
+    </div>
+
+    <form id="form" class="form" novalidate>
+
+        <div id="bus-details" class="form-group" hidden>
+
+            <h4>Personas que se alojarán</h4>
+
+            <p class="bus-description">
+                Podéis modificar los nombres o quitar a las personas
+                que no necesiten alojamiento.
+            </p>
+
+            <div id="bus-attendees-container"></div>
+
+            <button type="submit" class="submit-button">
+                <span class="button-text">Confirmar reserva</span>
+                <i class="fas fa-spinner fa-spin"></i>
+            </button>
+
+        </div>
+
+    </form>
+
+    <div id="bus-message" aria-live="polite"></div>
+</div>
+
             </div>
-        </section>
+    </section>
 
         <div class="section-divider">
             <i class="fas fa-heart"></i>

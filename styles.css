@@ -513,7 +513,8 @@ h1, h2, h3 {
 
 .form-group input,
 .form-group select,
-.form-group textarea {
+.form-group textarea,
+.bus-attendee-name {
     width: 100%;
     padding: 1rem;
     border: 2px solid var(--primary-color);
@@ -526,7 +527,8 @@ h1, h2, h3 {
 
 .form-group input:focus,
 .form-group select:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.bus-attendee-name:focus {
     outline: none;
     border-color: var(--accent-color);
     box-shadow: 0 0 0 3px rgba(235, 199, 158, 0.2);
@@ -554,7 +556,7 @@ h1, h2, h3 {
     opacity: 1;
 }
 
-.submit-button {
+.submit-button, .bus-remove-attendee {
     position: relative;
     background-color: var(--accent-color);
     color: white;
@@ -573,12 +575,12 @@ h1, h2, h3 {
     min-height: 3.5rem;
 }
 
-.submit-button:hover {
+.submit-button:hover, .bus-remove-attendee:hover {
     background-color: var(--primary-color);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.submit-button:active {
+.submit-button:active, .bus-remove-attendee:active {
     box-shadow: none;
 }
 
@@ -597,7 +599,7 @@ h1, h2, h3 {
     transform: translateX(-50%);
 }
 
-.submit-button:disabled {
+.submit-button:disabled, .bus-remove-attendee:disabled {
     background-color: #ccc;
     cursor: not-allowed;
     transform: none;
@@ -3391,4 +3393,58 @@ h1, h2, h3 {
     background-color: var(--primary-color);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+
+.bus-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 25px 0;
+}
+
+.bus-choice {
+    width: 100%;
+    padding: 15px 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    transition: all 0.2s ease;
+}
+
+.bus-choice:hover {
+    border-color: #999;
+}
+
+.bus-choice.active {
+    border-color: #8b7355;
+    background: rgba(139, 115, 85, 0.10);
+}
+
+.bus-description {
+    margin-bottom: 20px;
+}
+
+.bus-attendee {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.bus-attendee input {
+    flex: 1;
+    min-width: 0;
+}
+
+
+#bus-message {
+    margin-top: 20px;
+}
+
+[hidden] {
+    display: none !important;
 }
