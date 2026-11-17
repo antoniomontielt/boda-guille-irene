@@ -22,19 +22,18 @@ const CONFIG = {
   },
   CHAT: {
     QA_MAP: {
-      '¿Dónde es la ceremonia?': 'La ceremonia se celebrará en los jardines de la Hacienda Real Los Olivos.',
-      '¿A qué hora hay que estar allí?': 'Te recomendamos llegar al menos 30 minutos antes de la ceremonia, que comenzará a las 19:30 horas.',
-      '¿A qué hora empieza la ceremonia?': 'La ceremonia comenzará a las 19:30 horas.',
-      '¿A qué hora empieza el cóctel?': 'El cóctel empezará sobre las 21:00 horas, justo después de la ceremonia.',
-      '¿Dónde puedo aparcar?': 'El hotel cuenta con parking privado para los invitados.',
-      '¿Hay servicio de autobús?': 'Sí, habrá un servicio de autobús que saldrá desde la ciudad hasta el lugar de la celebración. Será un servicio de ida y vuelta. Puedes reservar tu plaza en el formulario de nuestra web. Te pedimos que lo hagas antes del 10 de agosto. Las plazas son limitadas.',
-      '¿Dónde puedo alojarme?': 'La Hacienda Real Los Olivos es un hotel pequeño por lo que las habitaciones son pocas, si están ya completas habla con los novios para que ellos te orienten.',
-      '¿Cómo puedo confirmar mi asistencia?': 'Puedes confirmar tu asistencia a través del formulario RSVP en nuestra web. Te pedimos que lo hagas antes del 10 de agosto.',
-      '¿Qué código de vestimenta hay?': 'Ninguno; salvo, de forma obvia, no ir de blanco.',
-      '¿Puedo llevar niños?': 'Por supuesto, los niños son bienvenidos. Hemos preparado una zona especial para ellos con actividades y entretenimiento.',
+      '¿Dónde es la ceremonia?': 'La ceremonia se celebrará en la finca VegHug. En la web encontrarás un mapa con la ubicación exacta y las indicaciones para llegar.',
+      '¿A qué hora hay que estar allí?': 'Te recomendamos llegar al menos 30 minutos antes de la ceremonia, que comenzará a las 13:00 horas.',
+      '¿A qué hora empieza la ceremonia?': 'La ceremonia comenzará a las 13:00 horas. Te recomendamos llegar al menos 30 minutos antes.',
+      '¿A qué hora empieza el cóctel?': 'Después de la ceremonia, alrededor de las 14:00 horas.',
+      '¿Dónde puedo aparcar?': 'La finca cuenta con parking privado y aparcamiento gratuito en las inmediaciones. Donde quieras, pijo, es campo.',
+      '¿Dónde puedo alojarme?': 'El lugar cuenta con habitaciones compartidas. Puedes hacer tu reserva a través de esta web. Se dará prioridad a las personas que vivan lejos.',
+      '¿Cómo puedo confirmar mi asistencia?': 'Puedes confirmar tu asistencia a través del formulario RSVP en nuestra web. Te pedimos que lo hagas antes del 15 de abril, por favor.',
+      '¿Qué código de vestimenta hay?': 'Ninguno; salvo, de forma obvia, no ir de blanco. Ni del Real Madrid.',
+      '¿Puedo llevar niños?': 'Por supuesto, los niños son bienvenidos.',
       '¿Qué tipo de regalo puedo hacer?': 'Tu presencia es nuestro mejor regalo, pero si deseas hacer un detalle, hemos habilitado un número de cuenta bancaria para contribuciones a nuestra luna de miel. Puedes encontrar el número de cuenta en la sección "Regalos" de nuestra web.',
       '¿Cómo puedo sugerir canciones para la boda?': 'Puedes sugerir canciones para la boda a través de la sección de música en nuestra web. Nos encantaría conocer tus preferencias musicales.',
-      '¿Se pueden compartir fotos de la boda?': 'Sí, nos encantaría que compartieras tus fotos de la boda. Puedes subirlas a nuestra galería en la sección "Galería" de nuestra web.'
+      '¿Se pueden compartir fotos de la boda?': 'El día de la boda os diremos cómo nos podéis hacer llegar las fotos y vídeos que hagáis.'
     }
   }
 };
