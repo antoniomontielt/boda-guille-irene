@@ -931,6 +931,11 @@ h1, h2, h3 {
     justify-content: center;
 }
 
+.booking-info i {
+    color: var(--accent-color);
+    margin-right: 0.5rem;
+}
+
 .booking-button:hover {
     background-color: var(--primary-color);
 }
