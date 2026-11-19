@@ -37,8 +37,8 @@ h1, h2, h3 {
     height: 100vh; /* Fallback para navegadores antiguos */
     height: 100dvh;
     min-height: -webkit-fill-available; /* Solución para Safari iOS */
-    background-image: url(./assets/prueba-5.jpg);
-    filter: grayscale(40%);
+    background-image: url(./assets/hero.webp);
+    filter: grayscale(30%);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -48,6 +48,12 @@ h1, h2, h3 {
     text-align: center;
     color: white;
     overflow: hidden;
+}
+
+@media screen and (max-width: 768px) {
+    .hero {
+        background-image: url(./assets/hero-mobile.webp);
+    }
 }
 
 
